@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Admin · TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+    <div class="admin-header">
+
+        <div>
+
+            <p class="eyebrow">
+                ADMINISTRATION
+            </p>
+
+            <h1>
+                Admin Console
+            </h1>
+
+            <p class="subtitle">
+                System configuration and application information.
+            </p>
+
+        </div>
+
+        <div class="admin-badge">
+            ADMIN
+        </div>
+
+    </div>
+
+
+    <section class="admin-card">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    System Secrets
+                </h2>
+
+                <p>
+                    Application configuration values.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="secret-list">
+
+            {% for secret in secrets %}
+
+            <div class="secret-item">
+
+                <div class="secret-number">
+                    {{ loop.index }}
+                </div>
+
+                <div class="secret-value">
+                    {{ secret }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <section class="admin-info-grid">
+
+        <div class="admin-info-card">
+
+            <span>
+                Signed in as
+            </span>
+
+            <strong>
+                {{ current_user.username }}
+            </strong>
+
+        </div>
+
+
+        <div class="admin-info-card">
+
+            <span>
+                Role
+            </span>
+
+            <strong>
+                {{ current_user.role }}
+            </strong>
+
+        </div>
+
+
+        <div class="admin-info-card">
+
+            <span>
+                Session
+            </span>
+
+            <strong>
+                JWT
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    <div class="admin-actions">
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="btn btn-primary"
+        >
+            Logout
+        </a>
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="btn btn-secondary"
+        >
+            Back to dashboard
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

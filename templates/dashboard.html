@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard · TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="dashboard">
+
+    <section class="dashboard-header">
+
+        <div>
+            <p class="eyebrow">YOUR WORKSPACE</p>
+
+            <h1>
+                Good to see you,
+                {{ current_user.username }}
+            </h1>
+
+            <p class="subtitle">
+                Plan your day and stay on top of the week.
+            </p>
+        </div>
+
+        <div class="date-badge">
+            <span class="date-label">TODAY</span>
+            <strong id="current-date"></strong>
+        </div>
+
+    </section>
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon">☀</div>
+
+            <div>
+                <span>Today's tasks</span>
+
+                <strong>
+                    {{ today_tasks|length }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">✓</div>
+
+            <div>
+                <span>Completed today</span>
+
+                <strong>
+                    {{ today_tasks|selectattr("completed")|list|length }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">▣</div>
+
+            <div>
+                <span>This week</span>
+
+                <strong>
+                    {{ today_tasks|length + upcoming_tasks|length }}
+                </strong>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="content-grid">
+
+        <div class="task-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>Today's focus</h2>
+
+                    <p>
+                        Tasks scheduled for today.
+                    </p>
+                </div>
+
+                <span class="task-count">
+                    {{ today_tasks|length }}
+                </span>
+
+            </div>
+
+            <div class="task-list">
+
+                {% if today_tasks %}
+
+                    {% for task in today_tasks %}
+
+                    <div
+                        class="task-item
+                        {% if task.completed %}completed{% endif %}"
+                    >
+
+                        <form
+                            method="POST"
+                            action="{{
+                                url_for(
+                                    'toggle_task',
+                                    task_id=task.id
+                                )
+                            }}"
+                        >
+                            <button
+                                type="submit"
+                                class="task-check"
+                                title="Toggle task"
+                            >
+                                {% if task.completed %}
+                                    ✓
+                                {% endif %}
+                            </button>
+                        </form>
+
+                        <div class="task-content">
+
+                            <div class="task-title">
+                                {{ task.title }}
+                            </div>
+
+                            {% if task.description %}
+
+                            <div class="task-description">
+                                {{ task.description }}
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <form
+                            method="POST"
+                            action="{{
+                                url_for(
+                                    'delete_task',
+                                    task_id=task.id
+                                )
+                            }}"
+                            class="delete-form"
+                            onsubmit="return confirmDelete()"
+                        >
+                            <button
+                                type="submit"
+                                class="delete-btn"
+                                title="Delete task"
+                            >
+                                ×
+                            </button>
+                        </form>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ☀
+                        </div>
+
+                        <h3>
+                            Nothing planned yet
+                        </h3>
+
+                        <p>
+                            Add your first task for today.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="task-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>Coming up</h2>
+
+                    <p>
+                        Tasks planned for the rest of the week.
+                    </p>
+                </div>
+
+                <span class="task-count">
+                    {{ upcoming_tasks|length }}
+                </span>
+
+            </div>
+
+            <div class="task-list">
+
+                {% if upcoming_tasks %}
+
+                    {% for task in upcoming_tasks %}
+
+                    <div
+                        class="task-item
+                        {% if task.completed %}completed{% endif %}"
+                    >
+
+                        <form
+                            method="POST"
+                            action="{{
+                                url_for(
+                                    'toggle_task',
+                                    task_id=task.id
+                                )
+                            }}"
+                        >
+                            <button
+                                type="submit"
+                                class="task-check"
+                                title="Toggle task"
+                            >
+                                {% if task.completed %}
+                                    ✓
+                                {% endif %}
+                            </button>
+                        </form>
+
+                        <div class="task-content">
+
+                            <div class="task-title">
+                                {{ task.title }}
+                            </div>
+
+                            <div class="task-meta">
+                                {{ task.task_date }}
+                            </div>
+
+                            {% if task.description %}
+
+                            <div class="task-description">
+                                {{ task.description }}
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <form
+                            method="POST"
+                            action="{{
+                                url_for(
+                                    'delete_task',
+                                    task_id=task.id
+                                )
+                            }}"
+                            class="delete-form"
+                            onsubmit="return confirmDelete()"
+                        >
+                            <button
+                                type="submit"
+                                class="delete-btn"
+                                title="Delete task"
+                            >
+                                ×
+                            </button>
+                        </form>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ▣
+                        </div>
+
+                        <h3>
+                            Your week is clear
+                        </h3>
+
+                        <p>
+                            Add a few tasks to plan ahead.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="add-task-panel">
+
+        <div class="panel-header">
+
+            <div>
+                <h2>Add a task</h2>
+
+                <p>
+                    Plan something for today or the next few days.
+                </p>
+            </div>
+
+        </div>
+
+        <form
+            method="POST"
+            action="{{ url_for('create_task') }}"
+            class="task-form"
+        >
+
+            <div class="form-group">
+
+                <label for="title">
+                    Task
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="What needs to be done?"
+                    maxlength="200"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <input
+                    type="text"
+                    id="description"
+                    name="description"
+                    placeholder="Optional details"
+                    maxlength="500"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="task_date">
+                    Date
+                </label>
+
+                <input
+                    type="date"
+                    id="task_date"
+                    name="task_date"
+                    min="{{ today }}"
+                    max="{{ week_end }}"
+                    value="{{ today }}"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                <span>+</span>
+                Add task
+            </button>
+
+        </form>
+
+    </section>
+
+</div>
+
+{% endblock %}
